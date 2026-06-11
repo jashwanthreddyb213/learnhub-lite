@@ -26,28 +26,37 @@ const registerUser=async(req,res)=>{
 	}
 }
 
-const loginUser=async(req,res)=>{
-	try{
-		const {email,password}=req.body;
-		const user=await User.findOne({email});
-		if(user && user.password===password){
-			res.json({
-				_id:user._id,
-				name:user.name,
-				email:user.email,
-				role:user.role,
-				token:generateToken(user._id)
-			});
-			
-		}else{
-			res.status(401).json({message:"Email or Password is incorrect"});
-		}
+const loginUser = async(req,res)=>{
+  try{
+    console.log("BODY:", req.body);
 
-	}catch(error){
-		res.status(500).json({message:error.message});
+    const { email,password } = req.body;
 
-	}
-}
+    const user = await User.findOne({ email });
+
+    console.log("FOUND USER:", user);
+
+    if(user && user.password === password){
+      return res.json({
+        _id:user._id,
+        name:user.name,
+        email:user.email,
+        role:user.role,
+        token:generateToken(user._id)
+      });
+    }
+
+    return res.status(401).json({
+      message:"Email or Password is incorrect"
+    });
+
+  }catch(error){
+    console.log("LOGIN ERROR:", error);
+    res.status(500).json({
+      message:error.message
+    });
+  }
+};
 const getProfile = async(req,res) => {
 
   res.json(req.user);
